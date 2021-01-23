@@ -3,12 +3,12 @@ import { Map } from 'immutable'
 
 const cfg = {
   http: {
-    port: 8081,
+    port: 7081,
   },
   https: {
     key: fs.readFileSync(process.env.SERVICE_PROVIDER === 'vultr' ? '/etc/cert/key.pem' : './etc/cert/key.pem'),
     cert: fs.readFileSync(process.env.SERVICE_PROVIDER === 'vultr' ? '/etc/cert/cert.pem' : './etc/cert/cert.pem'),
-    port: 8443,
+    port: 7443,
   },
   host: process.env.SERVICE_PROVIDER === 'vultr' ? 'ivarchen.xyz' : '192.168.0.147'
 }

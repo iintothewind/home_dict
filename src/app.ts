@@ -32,5 +32,4 @@ if (process.env.SERVICE_PROVIDER === 'vultr') {
   https.createServer({ key: cfg.https.key, cert: cfg.https.cert }, app.callback()).listen(cfg.https)
 } else {
   http.createServer(app.callback()).listen(cfg.http)
-
 }
