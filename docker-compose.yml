@@ -1,24 +1,7 @@
 version: "3"
 services:
-  redis:
-    container_name: "home_chat_redis"
-    image: "redis:6.0.8"
-    privileged: false
-    environment:
-      - TZ=Asia/Shanghai
-      - LANG=en_US.UTF-8
-    volumes:
-      - ./etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    ports:
-      - "16379:16379"
-    command: "redis-server /usr/local/etc/redis/redis.conf"
-    networks:
-      - home_chat
-
   node:
-    depends_on:
-      - redis
-    container_name: "home_chat_node"
+    container_name: "home_dict_node"
     image: "node:14"
     privileged: false
     user: "node"
@@ -26,15 +9,12 @@ services:
     environment:
       - SERVICE_PROVIDER=vultr
       - NODE_ENV=production
-      - REDIS_PASSWORD=
-      - CLIENT_ID=
-      - CLIENT_SECRET=
     volumes:
       - ./etc/cert/key.pem:/etc/cert/key.pem
       - ./etc/cert/cert.pem:/etc/cert/cert.pem
       - ./:/home/node/app
     ports:
-      - "8443:8443"
+      - "7443:7443"
     command: "node ./build/app.js"
     networks:
       - home_chat
