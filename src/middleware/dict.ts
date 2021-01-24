@@ -11,10 +11,10 @@ const translate: Router.IMiddleware = async ctx => {
     const entry = await lookup(user, word)
     if (entry) {
       const translation: Translation = {
-        word: entry.word,
-        phonetic: entry.phonetic,
-        definition: entry.definition,
-        translation: entry.translation,
+        word: entry.word || '',
+        phonetic: entry.phonetic || '',
+        definition: entry.definition || '',
+        translation: entry.translation || '',
         exchange: mapExchange(entry.exchange)
       }
       ctx.body = translation
