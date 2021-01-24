@@ -21,6 +21,7 @@ const exchMapping: Map<String, String> = Map({
   'r': '比较级',
   't': '最高级',
   's': '复数',
+  'f': '复数',
   '0': 'Lemma',
   '1': 'Lemma',
 })
