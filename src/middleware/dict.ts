@@ -3,7 +3,7 @@ import { exchMapping } from '../util'
 import { lookup } from '../util/db'
 import { Translation } from '../model'
 
-const mapExchange = (raw: string): string => raw.split('/').map(entry => `${exchMapping.get(entry.split(':')[0])} : ${entry.split(':')[1]}`).join('\n')
+const mapExchange = (raw: string): string => raw ? raw.split('/').map(entry => `${exchMapping.get(entry.split(':')[0])} : ${entry.split(':')[1]}`).join('\n') : ''
 
 const translate: Router.IMiddleware = async ctx => {
   const { user, word } = ctx.query as { user?: string, word?: string }
