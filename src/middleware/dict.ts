@@ -1,5 +1,6 @@
 import Router from 'koa-router'
 import { exchMapping } from '../util'
+import { cfg } from '../util'
 import { lookup } from '../util/db'
 import { Translation } from '../model'
 
@@ -7,7 +8,12 @@ const mapExchange = (raw: string): string => raw ? raw.split('/').map(entry => `
 
 const translate: Router.IMiddleware = async ctx => {
   const { user, word } = ctx.query as { user?: string, word?: string }
-  if (user && word) {
+  if (user
+    && user.trim().length > 0
+    && user.length < cfg.dict.maxUserNameLength
+    && word
+    && word.trim().length > 0
+    && word.length < cfg.dict.maxWordLength) {
     const entry = await lookup(user, word)
     if (entry) {
       const translation: Translation = {
@@ -24,7 +30,7 @@ const translate: Router.IMiddleware = async ctx => {
     }
   } else {
     ctx.status = 400
-    ctx.body = { error: 'request parameters: user and word are required' }
+    ctx.body = { error: 'request parameters: valid user and word are required' }
   }
 }
 

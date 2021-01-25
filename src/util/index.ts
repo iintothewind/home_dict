@@ -2,6 +2,10 @@ import * as fs from 'fs'
 import { Map } from 'immutable'
 
 const cfg = {
+  dict: {
+    maxUserNameLength: 64,
+    maxWordLength: 64,
+  },
   http: {
     port: 7081,
   },
