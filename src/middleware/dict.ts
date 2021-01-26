@@ -1,12 +1,23 @@
 import Router from 'koa-router'
 import { exchMapping } from '../util'
 import { cfg } from '../util'
-import { lookup } from '../util/db'
-import { Translation } from '../model'
+import * as db from '../util/db'
+import * as model from '../model'
+import * as entity from 'src/entity'
 
 const mapExchange = (raw: string): string => raw ? raw.split('/').map(entry => `${exchMapping.get(entry.split(':')[0])} : ${entry.split(':')[1]}`).join('\n') : ''
 
-const translate: Router.IMiddleware = async ctx => {
+const mapWord = (entry: entity.Word): model.Word => {
+  return {
+    word: entry.word || '',
+    phonetic: entry.phonetic || '',
+    definition: entry.definition || '',
+    translation: entry.translation || '',
+    exchange: mapExchange(entry.exchange)
+  } as model.Word
+}
+
+const lookup: Router.IMiddleware = async ctx => {
   const { user, word } = ctx.query as { user?: string, word?: string }
   if (user
     && user.trim().length > 0
@@ -14,16 +25,9 @@ const translate: Router.IMiddleware = async ctx => {
     && word
     && word.trim().length > 0
     && word.length < cfg.dict.maxWordLength) {
-    const entry = await lookup(user, word)
+    const entry = await db.lookup(user, word)
     if (entry) {
-      const translation: Translation = {
-        word: entry.word || '',
-        phonetic: entry.phonetic || '',
-        definition: entry.definition || '',
-        translation: entry.translation || '',
-        exchange: mapExchange(entry.exchange)
-      }
-      ctx.body = translation
+      ctx.body = mapWord(entry)
     } else {
       ctx.status = 404
       ctx.body = { error: 'requested word not found' }
@@ -34,4 +38,40 @@ const translate: Router.IMiddleware = async ctx => {
   }
 }
 
-export { translate }
+const fuzzySearch: Router.IMiddleware = async ctx => {
+  const { word } = ctx.query as { word?: string }
+  if (word
+    && word.trim().length > 0
+    && word.length < cfg.dict.maxWordLength) {
+    const words = await db.fuzzySearch(word)
+    if (words && words.length > 0) {
+      ctx.body = { words: words.map(w => mapWord(w)) }
+    } else {
+      ctx.status = 404
+      ctx.body = { error: 'requested word not found' }
+    }
+  } else {
+    ctx.status = 400
+    ctx.body = { error: 'request parameter: word is required' }
+  }
+}
+
+const searchHistory: Router.IMiddleware = async ctx => {
+  const { user } = ctx.query as { user?: string }
+  if (user
+    && user.trim().length > 0
+    && user.length < cfg.dict.maxUserNameLength) {
+    const usageList = await db.listUsage(user)
+    if (usageList && usageList.length > 0) {
+      ctx.body = { history: usageList.map(u => { return { word: u.word, frequency: u.frequency } }) }
+    } else {
+      ctx.status = 404
+      ctx.body = { error: 'requested search history not found' }
+    }
+  } else {
+    ctx.status = 400
+    ctx.body = { error: 'request parameter: user is required' }
+  }
+}
+
+export { lookup, fuzzySearch, searchHistory }

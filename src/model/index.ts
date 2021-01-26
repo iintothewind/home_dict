@@ -1,4 +1,4 @@
-interface Translation {
+interface Word {
   readonly word: string
   readonly phonetic: string
   readonly definition: string
@@ -6,5 +6,4 @@ interface Translation {
   readonly exchange: string
 }
 
-
-export { Translation }
+export { Word }
