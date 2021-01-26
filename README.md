@@ -7,7 +7,7 @@
 
 ### request
 
-- path: `/home_dict/translate`
+- path: `/home_dict/lookup`
 - param: `user=用户名`
 - param: `word=待查询的英文单词`
 
@@ -30,6 +30,71 @@
 ```json
 {
   "error": "requested word not found"
+}
+```
+
+### request
+
+- path: `/home_dict/fuzzy`
+- param: `word=待查询的英文单词`
+
+### response
+
+- 200 OK
+
+```json
+{
+  words:
+  [
+    {
+      "word": "good",
+      "phonetic": "gud",
+      "definition": "n. benefit\nn. moral excellence or admirableness\nn. that which is pleasing or valuable or useful\na. having desirable or positive qualities especially those suitable for a thing specified",
+      "translation": "n. 善行, 好处, 利益\na. 好的, 优良的, 上等的, 愉快的, 有益的, 好心的, 慈善的, 虔诚的",
+      "exchange": "复数 : goods\n比较级 : better\n最高级 : best"
+    }
+  ]
+}
+```
+
+- 404 Not Found
+
+```json
+{
+  "error": "requested word not found"
+}
+```
+
+### request
+
+- path: `/home_dict/history`
+- param: `user=用户名`
+
+### response
+
+- 200 OK
+
+```json
+{
+  history:
+  [
+    {
+      "word": "good",
+      "frequency": 3
+    },
+    {
+      "word": "bravo",
+      "frequency": 2
+    }
+  ]
+}
+```
+
+- 404 Not Found
+
+```json
+{
+  "error": "requested history not found"
 }
 ```
 
