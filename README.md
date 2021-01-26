@@ -44,8 +44,7 @@
 
 ```json
 {
-  words:
-  [
+  "words": [
     {
       "word": "good",
       "phonetic": "gud",
@@ -76,8 +75,7 @@
 
 ```json
 {
-  history:
-  [
+  "history": [
     {
       "word": "good",
       "frequency": 3
