@@ -4,6 +4,7 @@ import { cfg } from '../util'
 import * as db from '../util/db'
 import * as model from '../model'
 import * as entity from 'src/entity'
+import { Db } from 'typeorm'
 
 const mapExchange = (raw: string): string => raw ? raw.split('/').map(entry => `${exchMapping.get(entry.split(':')[0])} : ${entry.split(':')[1]}`).join('\n') : ''
 
@@ -27,10 +28,13 @@ const lookup: Router.IMiddleware = async ctx => {
     && word.length < cfg.dict.maxWordLength) {
     await db
       .lookup(user, word)
-      .then(entry => ctx.body = mapWord(entry))
-      .catch(error => {
-        ctx.status = 404
-        ctx.body = error
+      .then((entry: entity.Word) => {
+        if (entry) {
+          ctx.body = mapWord(entry)
+        } else {
+          ctx.status = 404
+          ctx.body = { error: `requested word: ${word} not found` }
+        }
       })
   } else {
     ctx.status = 400
@@ -64,13 +68,16 @@ const searchHistory: Router.IMiddleware = async ctx => {
   if (user
     && user.trim().length > 0
     && user.length < cfg.dict.maxUserNameLength) {
-    const usageList = await db.listUsage(user)
-    if (usageList && usageList.length > 0) {
-      ctx.body = { history: usageList.map(u => { return { word: u.word, frequency: u.frequency } }) }
-    } else {
-      ctx.status = 404
-      ctx.body = { error: 'requested search history not found' }
-    }
+    await db
+      .listUsage(user)
+      .then(lst => {
+        if (lst && lst.length > 0) {
+          ctx.body = { history: lst.map(u => { return { word: u.word, frequency: u.frequency } }) }
+        } else {
+          ctx.status = 404
+          ctx.body = { error: 'requested search history not found' }
+        }
+      })
   } else {
     ctx.status = 400
     ctx.body = { error: 'request parameter: user is required' }

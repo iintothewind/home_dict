@@ -53,8 +53,6 @@ const lookup = async (userName: string, word: string): Promise<Word> => {
   if (entry) {
     await updateUsage(userName, word)
     return entry
-  } else {
-    return Promise.reject({ message: `not found word: ${word} for user: ${userName}` } as Error)
   }
 }
 
