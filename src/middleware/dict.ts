@@ -25,13 +25,13 @@ const lookup: Router.IMiddleware = async ctx => {
     && word
     && word.trim().length > 0
     && word.length < cfg.dict.maxWordLength) {
-    const entry = await db.lookup(user, word)
-    if (entry) {
-      ctx.body = mapWord(entry)
-    } else {
-      ctx.status = 404
-      ctx.body = { error: 'requested word not found' }
-    }
+    await db
+      .lookup(user, word)
+      .then(entry => ctx.body = mapWord(entry))
+      .catch(error => {
+        ctx.status = 404
+        ctx.body = error
+      })
   } else {
     ctx.status = 400
     ctx.body = { error: 'request parameters: valid user and word are required' }
@@ -43,13 +43,16 @@ const fuzzySearch: Router.IMiddleware = async ctx => {
   if (word
     && word.trim().length > 0
     && word.length < cfg.dict.maxWordLength) {
-    const words = await db.fuzzySearch(word)
-    if (words && words.length > 0) {
-      ctx.body = { words: words.map(w => mapWord(w)) }
-    } else {
-      ctx.status = 404
-      ctx.body = { error: 'requested word not found' }
-    }
+    await db
+      .fuzzySearch(word)
+      .then(words => {
+        if (words && words.length > 0) {
+          ctx.body = { words: words.map(w => mapWord(w)) }
+        } else {
+          ctx.status = 404
+          ctx.body = { error: 'requested word not found' }
+        }
+      })
   } else {
     ctx.status = 400
     ctx.body = { error: 'request parameter: word is required' }
